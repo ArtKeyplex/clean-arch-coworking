@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"strings"
+
+	"github.com/google/uuid"
+)
 
 // BookingStatus defines the current state of booking
 //go:generate stringer -type=BookingStatus
@@ -41,7 +45,12 @@ func NewBooking(roomID, userID uuid.UUID, slot DateRange, price Money) (*Booking
 
 func (b *Booking) ID() uuid.UUID { return b.id }
 
+func (b *Booking) Status() BookingStatus { return b.status }
+
 func (b *Booking) ConfirmPayment(txID string) error {
+	if strings.TrimSpace(txID) == "" {
+		return ErrInvalidTransaction
+	}
 	if b.status != Pending {
 		return ErrWrongState
 	}

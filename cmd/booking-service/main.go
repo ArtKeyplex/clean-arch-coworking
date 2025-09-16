@@ -1,36 +1,20 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
 	bookinghttp "github.com/example/coworking/internal/booking/adapters/http"
 	"github.com/example/coworking/internal/booking/application"
-	"github.com/example/coworking/internal/booking/domain"
+	busdummy "github.com/example/coworking/internal/booking/infrastructure/bus/dummy"
+	"github.com/example/coworking/internal/booking/infrastructure/memory"
+	policydummy "github.com/example/coworking/internal/booking/infrastructure/policy/dummy"
 )
 
-type dummyRepo struct{}
-
-func (d dummyRepo) Save(ctx context.Context, b *domain.Booking) error { return nil }
-
-type dummyBus struct{}
-
-func (d dummyBus) Publish(ctx context.Context, events []domain.Event) error { return nil }
-
-type dummyPolicy struct{}
-
-func (d dummyPolicy) Check(ctx context.Context, roomID string, slot domain.DateRange) error {
-	return nil
-}
-func (d dummyPolicy) CalculatePrice(roomID string, slot domain.DateRange) domain.Money {
-	return domain.NewMoney(100, "USD")
-}
-
 func main() {
-	repo := dummyRepo{}
-	bus := dummyBus{}
-	policy := dummyPolicy{}
+	repo := memory.NewBookingRepository()
+	bus := busdummy.NewEventBus()
+	policy := policydummy.NewPolicy()
 	svc := application.NewService(repo, bus, policy)
 	handler := bookinghttp.NewBookingHandler(svc)
 
