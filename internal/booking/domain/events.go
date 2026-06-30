@@ -1,6 +1,7 @@
 package domain
 
-type Event interface{}
+type Event interface {
+}
 
 type RoomBooked struct {
 	BookingID string
@@ -11,4 +12,7 @@ type RoomBooked struct {
 type BookingConfirmed struct {
 	BookingID string
 	TxID      string
+}
+type BookingCancelled struct {
+	BookingID string
 }

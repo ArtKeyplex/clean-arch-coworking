@@ -16,6 +16,22 @@ type BookingRepository struct {
 	idempotencyKeys map[string]*domain.Booking
 }
 
+func (r *BookingRepository) GetByRoom(ctx context.Context, roomID uuid.UUID, slot domain.DateRange) ([]*domain.Booking, error) {
+	_, _ = ctx, slot
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var result []*domain.Booking
+
+	for _, b := range r.store {
+		if b.RoomID() == roomID {
+			result = append(result, b)
+		}
+	}
+
+	return result, nil
+}
+
 func NewBookingRepository() *BookingRepository {
 	return &BookingRepository{
 		store:           make(map[uuid.UUID]*domain.Booking),

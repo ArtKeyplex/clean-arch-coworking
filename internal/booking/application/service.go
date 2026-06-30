@@ -164,3 +164,16 @@ func (s *Service) ConfirmPayment(ctx context.Context, input ConfirmPaymentInput)
 	)
 	return nil
 }
+
+func (s *Service) CancelBooking(ctx context.Context, id uuid.UUID) error {
+	booking, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err = booking.Cancel(); err != nil {
+		return err
+	}
+	if err = s.repo.Save(ctx, booking); err != nil {
+	}
+	return nil
+}

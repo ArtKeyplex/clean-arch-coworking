@@ -11,19 +11,34 @@ type BookingStatus int
 const (
 	Pending BookingStatus = iota
 	Paid
-	Cancelled
+	Cancelled //<-
 )
 
+func (b *Booking) Cancel() error { //<-
+	switch b.status {
+	case Pending:
+	case Paid:
+		return ErrBookingAlreadyPaid
+	case Cancelled:
+		return ErrAlreadyCancelled
+	default:
+		return ErrWrongState
+	}
+	b.status = Cancelled
+	b.raise(BookingCancelled{BookingID: b.id.String()})
+	return nil
+}
+
 type Booking struct {
-	id              uuid.UUID
-	roomID          uuid.UUID
-	userID          uuid.UUID
-	slot            DateRange
-	price           Money
-	status          BookingStatus
-	events          []Event
-	idempotencyKey  string
-	transactionID   string
+	id             uuid.UUID
+	roomID         uuid.UUID
+	userID         uuid.UUID
+	slot           DateRange
+	price          Money
+	status         BookingStatus
+	events         []Event
+	idempotencyKey string
+	transactionID  string
 }
 
 func NewBooking(roomID, userID uuid.UUID, slot DateRange, price Money) (*Booking, error) {
@@ -43,12 +58,12 @@ func NewBooking(roomID, userID uuid.UUID, slot DateRange, price Money) (*Booking
 }
 
 func (b *Booking) ID() uuid.UUID         { return b.id }
-func (b *Booking) RoomID() uuid.UUID      { return b.roomID }
-func (b *Booking) UserID() uuid.UUID      { return b.userID }
-func (b *Booking) Slot() DateRange        { return b.slot }
-func (b *Booking) Price() Money           { return b.price }
-func (b *Booking) Status() BookingStatus  { return b.status }
-func (b *Booking) TransactionID() string  { return b.transactionID }
+func (b *Booking) RoomID() uuid.UUID     { return b.roomID }
+func (b *Booking) UserID() uuid.UUID     { return b.userID }
+func (b *Booking) Slot() DateRange       { return b.slot }
+func (b *Booking) Price() Money          { return b.price }
+func (b *Booking) Status() BookingStatus { return b.status }
+func (b *Booking) TransactionID() string { return b.transactionID }
 
 func (b *Booking) ConfirmPayment(txID string) error {
 	if strings.TrimSpace(txID) == "" {

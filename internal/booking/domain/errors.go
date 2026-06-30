@@ -7,4 +7,7 @@ var (
 	ErrWrongState         = errors.New("booking in wrong state")
 	ErrBookingNotFound    = errors.New("booking not found")
 	ErrInvalidTransaction = errors.New("invalid payment transaction")
+	ErrBookingAlreadyPaid = errors.New("ErrBookingAlreadyPaid")
+	ErrAlreadyCancelled   = errors.New("ErrAlreadyCancelled")
+	ErrRoomNotAvailable   = errors.New("ErrRoomNotAvailable")
 )
